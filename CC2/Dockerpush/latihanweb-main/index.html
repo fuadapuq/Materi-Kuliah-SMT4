@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITEKES Mahardika Cirebon - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles for enhanced dashboard appearance */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #3B82F6 0%, #9333EA 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg sidebar z-50" id="sidebar">
+        <div class="p-5">
+            <h1 class="text-2xl font-bold text-gray-800">ITEKES Mahardika</h1>
+            <p class="text-sm text-gray-500">Cirebon</p>
+        </div>
+        <nav class="mt-5">
+            <a href="#" class="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+            </a>
+            <a href="#" class="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                <i class="fas fa-user-graduate mr-3"></i> Students
+            </a>
+            <a href="#" class="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                <i class="fas fa-chalkboard-teacher mr-3"></i> Lecturers
+            </a>
+            <a href="#" class="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                <i class="fas fa-book-open mr-3"></i> Courses
+            </a>
+            <a href="#" class="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600">
+                <i class="fas fa-cog mr-3"></i> Settings
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-0 md:ml-64 transition-all duration-300" id="main-content">
+        <!-- Header -->
+        <header class="bg-white shadow p-4 flex justify-between items-center gradient-bg text-white">
+            <div class="flex items-center">
+                <button id="toggleSidebar" class="md:hidden text-white">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <h2 class="text-xl font-semibold ml-4">Dashboard</h2>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 rounded-full bg-gray-100 text-gray-800 focus:outline-none">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-user-circle text-2xl"></i>
+                    <span class="ml-2 hidden md:block">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="p-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow card">
+                    <h3 class="text-lg font-semibold text-gray-700">Total Students</h3>
+                    <p class="text-3xl font-bold text-blue-600">1,234</p>
+                    <p class="text-sm text-gray-500">+5% from last month</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow card">
+                    <h3 class="text-lg font-semibold text-gray-700">Active Courses</h3>
+                    <p class="text-3xl font-bold text-green-600">56</p>
+                    <p class="text-sm text-gray-500">+2 new this semester</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow card">
+                    <h3 class="text-lg font-semibold text-gray-700">Lecturers</h3>
+                    <p class="text-3xl font-bold text-purple-600">78</p>
+                    <p class="text-sm text-gray-500">+3% from last year</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow card">
+                    <h3 class="text-lg font-semibold text-gray-700">Campus Events</h3>
+                    <p class="text-3xl font-bold text-orange-600">15</p>
+                    <p class="text-sm text-gray-500">Upcoming this month</p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Bar Chart -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Student Enrollment</h3>
+                    <canvas id="enrollmentChart" height="100"></canvas>
+                </div>
+                <!-- Pie Chart -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Course Distribution</h3>
+                    <canvas id="courseChart" height="100"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-hidden');
+            mainContent.classList.toggle('md:ml-64');
+            mainContent.classList.toggle('ml-0');
+        });
+
+        // Bar Chart
+        const enrollmentCtx = document.getElementById('enrollmentChart').getContext('2d');
+        new Chart(enrollmentCtx, {
+            type: 'bar',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                datasets: [{
+                    label: 'Students Enrolled',
+                    data: [800, 900, 1000, 1100, 1200, 1234],
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const courseCtx = document.getElementById('courseChart').getContext('2d');
+        new Chart(courseCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Nursing', 'Midwifery', 'Pharmacy', 'Public Health'],
+                datasets: [{
+                    data: [40, 30, 20, 10],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(147, 51, 234, 0.7)',
+                        'rgba(249, 115, 22, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+</body>
+</html>
